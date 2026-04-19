@@ -129,7 +129,7 @@ python scripts/refresh_tokens.py --force
 }
 ```
 
-`hrv_*` fields are `null` on days without a qualifying overnight sleep session (≥ 3 hours), since Fitbit computes HRV from sleep.
+`hrv_rmssd`, `hrv_daily_rmssd`, and `hrv_deep_rmssd` are `null` on days without a qualifying overnight sleep session (≥ 3 hours), since Fitbit computes HRV from sleep.
 
 ## Structure
 - `scripts/fitbit_api.py`: Main API wrapper and CLI tool.
