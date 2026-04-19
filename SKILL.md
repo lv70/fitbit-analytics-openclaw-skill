@@ -60,6 +60,7 @@ python scripts/fitbit_briefing.py --format json      # JSON output
 # - Yesterday's Active Zone Minutes (total, Fat Burn, Cardio, Peak)
 # - Today's activity summary (steps, calories, floors, distance)
 # - Heart rate (resting, average, zones)
+# - Heart rate variability (daily & deep-sleep RMSSD)
 # - Sleep (duration, efficiency, awake episodes)
 # - Trends vs 7-day average
 ```
@@ -75,6 +76,9 @@ python scripts/fitbit_briefing.py --format json      # JSON output
   "active_minutes": 47,
   "resting_hr": 58,
   "avg_hr": 72,
+  "hrv_rmssd": 42.0,
+  "hrv_daily_rmssd": 42.0,
+  "hrv_deep_rmssd": 38.1,
   "sleep_hours": 7.2,
   "sleep_efficiency": 89,
   "awake_minutes": 12,
@@ -114,6 +118,7 @@ client = FitbitClient()  # Uses env vars for credentials
 steps_data = client.get_steps(start_date="2026-01-01", end_date="2026-01-16")
 hr_data = client.get_heartrate(start_date="2026-01-01", end_date="2026-01-16")
 sleep_data = client.get_sleep(start_date="2026-01-01", end_date="2026-01-16")
+hrv_data = client.get_hrv("2026-01-15")
 activity_summary = client.get_activity_summary(start_date="2026-01-01", end_date="2026-01-16")
 PY
 ```
@@ -153,6 +158,7 @@ python {baseDir}/scripts/alerts.py --days 7 --steps 8000 --sleep 7
 | `get_heartrate(start, end)` | Heart rate data |
 | `get_sleep(start, end)` | Sleep data |
 | `get_sleep_stages(start, end)` | Detailed sleep stages |
+| `get_hrv(date)` | Daily HRV summary (dailyRmssd, deepRmssd) |
 | `get_spo2(start, end)` | Blood oxygen levels |
 | `get_weight(start, end)` | Weight measurements |
 | `get_active_zone_minutes(start, end)` | Active Zone Minutes (AZM) breakdown |
