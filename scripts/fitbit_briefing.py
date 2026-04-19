@@ -52,7 +52,12 @@ def _format_brief_briefing(data, baseline=None):
     resting_hr = data.get("resting_hr", "N/A")
     sleep_hours = data.get("sleep_hours", "N/A")
     hrv_rmssd = data.get("hrv_rmssd")
-    hrv_display = f"{hrv_rmssd} ms" if hrv_rmssd is not None else "N/A"
+    if isinstance(hrv_rmssd, (int, float)):
+        hrv_display = f"{float(hrv_rmssd):.1f} ms"
+    elif hrv_rmssd is not None:
+        hrv_display = f"{hrv_rmssd} ms"
+    else:
+        hrv_display = "N/A"
     if sleep_hours and sleep_hours != "N/A":
         lines.append(f"❤️ Resting HR: {resting_hr} • 💓 HRV: {hrv_display} • 💤 {sleep_hours}h sleep")
     else:
@@ -224,6 +229,8 @@ def main():
         sleep_efficiency = None
         awake_count = None
         hrv_rmssd = None
+        hrv_daily_rmssd = None
+        hrv_deep_rmssd = None
         
         steps_list = steps_data.get("activities-steps", []) if steps_data else []
         calories_list = calories_data.get("activities-calories", []) if calories_data else []
@@ -291,7 +298,18 @@ def main():
         hrv_list = hrv_data.get("hrv", []) if isinstance(hrv_data, dict) else []
         if hrv_list:
             value = hrv_list[0].get("value", {}) if isinstance(hrv_list[0], dict) else {}
-            hrv_rmssd = value.get("rmssd") if isinstance(value, dict) else None
+            if isinstance(value, dict):
+                def _to_rounded_float(raw_value):
+                    try:
+                        return round(float(raw_value), 1)
+                    except (TypeError, ValueError):
+                        return None
+
+                daily_rmssd = value.get("dailyRmssd")
+                deep_rmssd = value.get("deepRmssd")
+                hrv_daily_rmssd = _to_rounded_float(daily_rmssd)
+                hrv_deep_rmssd = _to_rounded_float(deep_rmssd)
+                hrv_rmssd = hrv_daily_rmssd if hrv_daily_rmssd is not None else hrv_deep_rmssd
         
         # Calculate trends vs 7-day average
         week_start = (datetime.strptime(target_date, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
@@ -358,6 +376,8 @@ def main():
             "resting_hr": resting_hr,
             "avg_hr": avg_hr,
             "hrv_rmssd": hrv_rmssd,
+            "hrv_daily_rmssd": hrv_daily_rmssd,
+            "hrv_deep_rmssd": hrv_deep_rmssd,
             "hr_zones": hr_zones,
             "sleep_hours": sleep_hours,
             "sleep_efficiency": sleep_efficiency,

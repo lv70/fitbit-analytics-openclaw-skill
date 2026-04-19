@@ -48,7 +48,7 @@ class FakeClient:
         return {"sleep": [{"duration": 7 * 3600000, "efficiency": 90, "minutesAwake": 10}]}
 
     def get_hrv(self, start_date, end_date=None):
-        return {"hrv": [{"value": {"rmssd": 42}}]}
+        return {"hrv": [{"value": {"dailyRmssd": 42.0, "deepRmssd": 38.1}, "dateTime": "2026-03-14"}]}
 
     def _request(self, endpoint):
         return {}
@@ -59,7 +59,7 @@ class FitbitBriefingTests(unittest.TestCase):
         output = fitbit_briefing._format_brief_briefing(
             {"steps_today": 8000, "calories_today": 2200, "resting_hr": 58, "hrv_rmssd": 42, "sleep_hours": 7.0}
         )
-        self.assertIn("❤️ Resting HR: 58 • 💓 HRV: 42 ms • 💤 7.0h sleep", output)
+        self.assertIn("❤️ Resting HR: 58 • 💓 HRV: 42.0 ms • 💤 7.0h sleep", output)
 
     def test_format_brief_uses_na_when_hrv_missing(self):
         output = fitbit_briefing._format_brief_briefing(
@@ -75,7 +75,41 @@ class FitbitBriefingTests(unittest.TestCase):
                     fitbit_briefing.main()
 
         payload = json.loads(stdout.getvalue())
-        self.assertEqual(payload["hrv_rmssd"], 42)
+        self.assertEqual(payload["hrv_rmssd"], 42.0)
+        self.assertEqual(payload["hrv_daily_rmssd"], 42.0)
+        self.assertEqual(payload["hrv_deep_rmssd"], 38.1)
+
+    def test_main_json_output_falls_back_to_deep_rmssd_when_daily_missing(self):
+        class DeepOnlyHrvClient(FakeClient):
+            def get_hrv(self, start_date, end_date=None):
+                return {"hrv": [{"value": {"deepRmssd": 38.1}, "dateTime": "2026-03-14"}]}
+
+        stdout = io.StringIO()
+        with mock.patch.object(fitbit_briefing, "FitbitClient", return_value=DeepOnlyHrvClient()):
+            with mock.patch.object(sys, "argv", ["fitbit_briefing.py", "--format", "json", "--date", "2026-03-14"]):
+                with redirect_stdout(stdout):
+                    fitbit_briefing.main()
+
+        payload = json.loads(stdout.getvalue())
+        self.assertIsNone(payload["hrv_daily_rmssd"])
+        self.assertEqual(payload["hrv_deep_rmssd"], 38.1)
+        self.assertEqual(payload["hrv_rmssd"], 38.1)
+
+    def test_main_json_output_handles_empty_hrv_list_and_brief_shows_na(self):
+        class EmptyHrvClient(FakeClient):
+            def get_hrv(self, start_date, end_date=None):
+                return {"hrv": []}
+
+        stdout = io.StringIO()
+        with mock.patch.object(fitbit_briefing, "FitbitClient", return_value=EmptyHrvClient()):
+            with mock.patch.object(sys, "argv", ["fitbit_briefing.py", "--format", "json", "--date", "2026-03-14"]):
+                with redirect_stdout(stdout):
+                    fitbit_briefing.main()
+
+        payload = json.loads(stdout.getvalue())
+        self.assertIsNone(payload["hrv_rmssd"])
+        brief_output = fitbit_briefing._format_brief_briefing(payload)
+        self.assertIn("💓 HRV: N/A", brief_output)
 
 
 if __name__ == "__main__":

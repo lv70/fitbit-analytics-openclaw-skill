@@ -24,7 +24,7 @@
 | Metric | Healthy Range | Warning |
 |--------|---------------|---------|
 | Resting HR (RHR) | 60-100 bpm | <50 or >100 |
-| HRV | 20-80 ms | Low HRV = stress |
+| HRV | 20-80 ms | Low HRV = stress. Fitbit may show N/A unless there is a qualifying overnight sleep session (≥ 3 hours). |
 | Time in Cardio | 20-40 min | Higher = better fitness |
 | Time in Peak | 10-20 min | High-intensity capacity |
 
