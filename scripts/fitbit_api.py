@@ -448,7 +448,7 @@ class FitbitClient:
     def get_hrv(self, start_date, end_date=None):
         """Fetch HRV data for a single date."""
         if end_date and end_date != start_date:
-            raise ValueError("get_hrv supports only single-date requests.")
+            raise ValueError("get_hrv supports single-date requests only; end_date must be None or match start_date.")
         endpoint = f"1/user/-/hrv/date/{start_date}.json"
         return self._request(endpoint)
 

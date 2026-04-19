@@ -210,7 +210,7 @@ def main():
         activity_data = client.get_activity_summary(target_date, target_date)
         hr_data = client.get_heartrate(target_date, target_date)
         sleep_data = client.get_sleep(target_date, target_date)
-        hrv_data = client.get_hrv(target_date, target_date)
+        hrv_data = client.get_hrv(target_date)
         
         # Extract today's values
         today_steps = 0
@@ -289,7 +289,7 @@ def main():
             sleep_efficiency = sleep_summary.get("efficiency")
             awake_count = sleep_summary.get("minutesAwake")
         hrv_list = hrv_data.get("hrv", []) if isinstance(hrv_data, dict) else []
-        if hrv_list and len(hrv_list) > 0:
+        if hrv_list:
             value = hrv_list[0].get("value", {}) if isinstance(hrv_list[0], dict) else {}
             hrv_rmssd = value.get("rmssd") if isinstance(value, dict) else None
         
