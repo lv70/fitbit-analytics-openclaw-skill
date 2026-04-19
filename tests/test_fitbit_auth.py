@@ -198,6 +198,21 @@ class FitbitAuthTests(unittest.TestCase):
         self.assertEqual(response, {"ok": True})
         refresh_mock.assert_called_once_with(force=True)
 
+    def test_get_hrv_requests_single_date_endpoint(self):
+        client = self.make_client()
+
+        with mock.patch.object(client, "_request", return_value={"hrv": []}) as request_mock:
+            response = client.get_hrv("2026-03-14")
+
+        self.assertEqual(response, {"hrv": []})
+        request_mock.assert_called_once_with("1/user/-/hrv/date/2026-03-14.json")
+
+    def test_get_hrv_rejects_date_ranges(self):
+        client = self.make_client()
+
+        with self.assertRaises(ValueError):
+            client.get_hrv("2026-03-14", "2026-03-15")
+
     def test_refresh_access_token_raises_reauth_error_for_invalid_grant(self):
         client = self.make_client()
         client._save_tokens("old_access", "old_refresh", 3600)

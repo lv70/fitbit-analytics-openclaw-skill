@@ -51,10 +51,12 @@ def _format_brief_briefing(data, baseline=None):
     # Line 2: Heart rate and sleep
     resting_hr = data.get("resting_hr", "N/A")
     sleep_hours = data.get("sleep_hours", "N/A")
+    hrv_rmssd = data.get("hrv_rmssd")
+    hrv_display = f"{hrv_rmssd} ms" if hrv_rmssd is not None else "N/A"
     if sleep_hours and sleep_hours != "N/A":
-        lines.append(f"❤️ Resting HR: {resting_hr} • 💤 {sleep_hours}h sleep")
+        lines.append(f"❤️ Resting HR: {resting_hr} • 💓 HRV: {hrv_display} • 💤 {sleep_hours}h sleep")
     else:
-        lines.append(f"❤️ Resting HR: {resting_hr} • 💤 Sleep: N/A")
+        lines.append(f"❤️ Resting HR: {resting_hr} • 💓 HRV: {hrv_display} • 💤 Sleep: N/A")
     
     # Line 3: Activity level and trends
     activity_level = data.get("activity_level", "Unknown")
@@ -208,6 +210,7 @@ def main():
         activity_data = client.get_activity_summary(target_date, target_date)
         hr_data = client.get_heartrate(target_date, target_date)
         sleep_data = client.get_sleep(target_date, target_date)
+        hrv_data = client.get_hrv(target_date, target_date)
         
         # Extract today's values
         today_steps = 0
@@ -220,6 +223,7 @@ def main():
         sleep_hours = None
         sleep_efficiency = None
         awake_count = None
+        hrv_rmssd = None
         
         steps_list = steps_data.get("activities-steps", []) if steps_data else []
         calories_list = calories_data.get("activities-calories", []) if calories_data else []
@@ -284,6 +288,10 @@ def main():
             sleep_hours = round(sleep_duration / 3600000, 1) if sleep_duration else None
             sleep_efficiency = sleep_summary.get("efficiency")
             awake_count = sleep_summary.get("minutesAwake")
+        hrv_list = hrv_data.get("hrv", []) if isinstance(hrv_data, dict) else []
+        if hrv_list and len(hrv_list) > 0:
+            value = hrv_list[0].get("value", {}) if isinstance(hrv_list[0], dict) else {}
+            hrv_rmssd = value.get("rmssd") if isinstance(value, dict) else None
         
         # Calculate trends vs 7-day average
         week_start = (datetime.strptime(target_date, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
@@ -349,6 +357,7 @@ def main():
             "activity_level": activity_level,
             "resting_hr": resting_hr,
             "avg_hr": avg_hr,
+            "hrv_rmssd": hrv_rmssd,
             "hr_zones": hr_zones,
             "sleep_hours": sleep_hours,
             "sleep_efficiency": sleep_efficiency,

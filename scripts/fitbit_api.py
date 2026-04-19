@@ -445,6 +445,13 @@ class FitbitClient:
         endpoint = f"1/user/-/activities/heart/date/{start_date}/{end_date}.json"
         return self._request(endpoint)
 
+    def get_hrv(self, start_date, end_date=None):
+        """Fetch HRV data for a single date."""
+        if end_date and end_date != start_date:
+            raise ValueError("get_hrv supports only single-date requests.")
+        endpoint = f"1/user/-/hrv/date/{start_date}.json"
+        return self._request(endpoint)
+
     def get_sleep(self, start_date, end_date):
         """Fetch sleep data (summary)"""
         endpoint = f"1.2/user/-/sleep/date/{start_date}/{end_date}.json"
