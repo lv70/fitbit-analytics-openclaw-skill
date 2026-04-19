@@ -9,6 +9,7 @@ Fitbit health and fitness data integration for OpenClaw. Fetch steps, heart rate
 
 - **Activity Tracking**: Fetch daily steps, distance, calories, and active minutes.
 - **Heart Rate**: Access continuous heart rate data and resting heart rate trends.
+- **Heart Rate Variability (HRV)**: Daily RMSSD from qualifying overnight sleep sessions.
 - **Sleep Analytics**: Analyze sleep stages (Deep, Light, REM, Wake) and efficiency.
 - **Reports**: Generate daily/weekly health reports with trend analysis.
 - **Automation**: Scripts ready for cron jobs (e.g., daily summaries).
@@ -97,7 +98,7 @@ python scripts/refresh_tokens.py --force
 **Example brief output:**
 ```
 📊 8,543 steps • 2,340 cal
-❤️ Resting HR: 58 • 💤 7.2h sleep
+❤️ Resting HR: 58 • 💓 HRV: 42.0 ms • 💤 7.2h sleep
 🏃 Moderate • ↑ 12% vs avg
 ```
 
@@ -112,6 +113,9 @@ python scripts/refresh_tokens.py --force
   "active_minutes": 47,
   "resting_hr": 58,
   "avg_hr": 72,
+  "hrv_rmssd": 42.0,
+  "hrv_daily_rmssd": 42.0,
+  "hrv_deep_rmssd": 38.1,
   "sleep_hours": 7.2,
   "sleep_efficiency": 89,
   "awake_minutes": 12,
@@ -124,6 +128,8 @@ python scripts/refresh_tokens.py --force
   }
 }
 ```
+
+`hrv_*` fields are `null` on days without a qualifying overnight sleep session (≥ 3 hours), since Fitbit computes HRV from sleep.
 
 ## Structure
 - `scripts/fitbit_api.py`: Main API wrapper and CLI tool.
