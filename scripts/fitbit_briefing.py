@@ -264,7 +264,7 @@ def _format_brief(data):
 
     return "\n".join([
         f"📊 {steps:,} steps • {calories:,} cal",
-        f"❤️  Resting HR: {resting_hr} • 💓 HRV: {hrv} • 💤 {sleep_str} sleep",
+        f"❤️ Resting HR: {resting_hr} • 💓 HRV: {hrv} • 💤 {sleep_str} sleep",
         f"🏃 {activity_level} • {trend} vs avg",
     ])
 

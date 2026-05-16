@@ -98,7 +98,7 @@ python scripts/refresh_tokens.py --force
 **Example brief output:**
 ```
 📊 8,543 steps • 2,340 cal
-❤️ Resting HR: 58 • 💓 HRV: 42.0 ms • 💤 7.2h sleep
+❤️ Resting HR: 58 • 💓 HRV: 42 ms • 💤 7.2h sleep
 🏃 Moderate • ↑ 12% vs avg
 ```
 
