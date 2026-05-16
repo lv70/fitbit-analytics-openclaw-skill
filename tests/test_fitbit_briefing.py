@@ -56,13 +56,13 @@ class FakeClient:
 
 class FitbitBriefingTests(unittest.TestCase):
     def test_format_brief_includes_hrv_with_units(self):
-        output = fitbit_briefing._format_brief_briefing(
+        output = fitbit_briefing._format_brief(
             {"steps_today": 8000, "calories_today": 2200, "resting_hr": 58, "hrv_rmssd": 42, "sleep_hours": 7.0}
         )
-        self.assertIn("❤️ Resting HR: 58 • 💓 HRV: 42.0 ms • 💤 7.0h sleep", output)
+        self.assertIn("❤️ Resting HR: 58 • 💓 HRV: 42 ms • 💤 7.0h sleep", output)
 
     def test_format_brief_uses_na_when_hrv_missing(self):
-        output = fitbit_briefing._format_brief_briefing(
+        output = fitbit_briefing._format_brief(
             {"steps_today": 8000, "calories_today": 2200, "resting_hr": 58, "sleep_hours": 7.0}
         )
         self.assertIn("❤️ Resting HR: 58 • 💓 HRV: N/A • 💤 7.0h sleep", output)
@@ -108,7 +108,7 @@ class FitbitBriefingTests(unittest.TestCase):
 
         payload = json.loads(stdout.getvalue())
         self.assertIsNone(payload["hrv_rmssd"])
-        brief_output = fitbit_briefing._format_brief_briefing(payload)
+        brief_output = fitbit_briefing._format_brief(payload)
         self.assertIn("💓 HRV: N/A", brief_output)
 
 
