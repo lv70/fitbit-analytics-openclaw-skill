@@ -133,6 +133,19 @@ python scripts/refresh_tokens.py --force
 These fields are `null` on days without a qualifying overnight sleep session
 (≥ 3 hours), since Fitbit computes HRV from sleep.
 
+### Date anchoring: yesterday's activity, last night's sleep & HRV
+
+Every metric in the briefing is *yesterday's* (the last full day of activity
+data — steps, calories, heart rate, logged exercises, Active Zone Minutes)
+**except sleep and HRV**, which are overnight measurements. Fitbit dates sleep
+and HRV records by the day they ended, so a morning briefing fetches them for
+today (the briefing date) — that's the sleep session and HRV reading from the
+night just past. The long-format briefing labels each section accordingly.
+
+Sleep extraction also prefers the `isMainSleep` record and falls back to the
+longest entry, so a daytime nap won't shadow your main overnight sleep when
+both appear in the same payload.
+
 ## Structure
 - `scripts/fitbit_api.py`: Main API wrapper and CLI tool.
 - `scripts/refresh_tokens.py`: Standalone proactive token refresh CLI.
